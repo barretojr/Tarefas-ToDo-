@@ -11,9 +11,9 @@ namespace Tarefas.Servico.Interfaces
     {
         Task<IEnumerable<TarefaDTO>> ListarAsync();
         Task<TarefaDTO> ObterAsync(Guid id);
-        Task<TarefaDTO> CriarAsync(TarefaDTO dto);
+        Task<TarefaDTO> CriarAsync(CriarTarefaDTO dto);
         Task<TarefaDTO> AtualizarAsync(Guid id, TarefaDTO dto);
-        Task ToggleAsync(Guid id);
+        Task<TarefaDTO> ToggleAsync(Guid id);
         Task ExcluirAsync(Guid id);
     }
 }

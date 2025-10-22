@@ -25,11 +25,12 @@ export class AppComponent implements OnInit {
   private tarefaService = inject(TarefaService);
   private notificationService = inject(NotificationService);
   private fb = inject(FormBuilder);
+  private reconexaoTimer: any = null;
 
   tasks: WritableSignal<Tarefa[]> = signal([]);
-  isLoading = signal(false);
+  isLoading = signal(true);
   isCreating = signal(false);
-  useLocalStorage = signal(true);
+  useLocalStorage = signal(false);
 
   tarefaForm = this.fb.group({
     titulo: ['', [Validators.required, Validators.maxLength(100)]],
@@ -42,6 +43,10 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadTasks();
+  }
+
+  ngOnDestroy(): void {  
+    this.pararTentativasDeReconexao();
   }
 
   loadTasks() {
@@ -65,7 +70,7 @@ export class AppComponent implements OnInit {
 
   drop(event: CdkDragDrop<Tarefa[]>) {
     if (event.previousContainer === event.container) {
-      // Futuramente, pode-se implementar a lógica para reordenar no backend aqui
+      // Futuramente, pode-se implementar a lógica para reordenar aqui
       return;
     }
 
@@ -132,11 +137,17 @@ export class AppComponent implements OnInit {
   }
 
   toggleStorageMode() {
-    this.useLocalStorage.update(val => !val);
-    const source = this.useLocalStorage() ? 'armazenamento local' : 'servidor backend';
-    this.notificationService.addNotification(`Alternado para ${source}`, 'info');
-    this.loadTasks();
+  this.useLocalStorage.update(val => !val);
+  const isLocal = this.useLocalStorage();
+  const source = isLocal ? 'armazenamento local' : 'servidor backend';
+  this.notificationService.addNotification(`Alternado para ${source}`, 'info');
+  this.loadTasks();
+  if (isLocal) {
+    this.iniciarTentativasDeReconexao();
+  } else {
+    this.pararTentativasDeReconexao();
   }
+}
 
   get notificationsSignal() {
     return this.notificationService.notifications;
@@ -145,4 +156,26 @@ export class AppComponent implements OnInit {
   dismissNotification(id: number) {
     this.notificationService.dismissNotification(id);
   }
+
+  iniciarTentativasDeReconexao() {
+  if (this.reconexaoTimer) return;
+  this.reconexaoTimer = setInterval(() => {    
+    this.tarefaService.listar(false).subscribe({
+      next: () => {
+        this.notificationService.addNotification('Conexão com o servidor restabelecida!', 'success');
+        this.useLocalStorage.set(false); 
+        this.loadTasks(); 
+        this.pararTentativasDeReconexao(); 
+      }
+    });
+  }, 15000); 
+}
+
+
+pararTentativasDeReconexao() {
+  if (this.reconexaoTimer) {
+    clearInterval(this.reconexaoTimer);
+    this.reconexaoTimer = null;
+  }
+}
 }

@@ -3,7 +3,7 @@ using Tarefas.Dominio.Interfaces;
 using Tarefas.Dominio.Entidades;
 using Microsoft.EntityFrameworkCore;
 
-namespace Tarefas.Repositorio.Infra
+namespace Tarefas.Repositorio
 {
     public class TarefaRepository : ITarefaRepository
     {

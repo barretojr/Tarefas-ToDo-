@@ -94,7 +94,11 @@
                       {{ task.prioridade | titlecase }}
                     </span>
                   </div>
-                  <div class="task-actions">
+                  <div class="task-actions d-flex">
+                    <button (click)="handleToggleComplete(task.id)" class="btn btn-sm btn-outline-success border-0"
+                      title="Concluir tarefa">
+                      <i class="bi bi-check-lg"></i>
+                    </button>
                     <button (click)="handleDeleteTask(task.id)" class="btn btn-sm btn-outline-danger border-0"
                       title="Excluir tarefa">
                       <i class="bi bi-trash"></i>
@@ -130,7 +134,11 @@
                       {{ task.prioridade | titlecase }}
                     </span>
                   </div>
-                  <div class="task-actions">
+                  <div class="task-actions d-flex">
+                    <button (click)="handleToggleComplete(task.id)" class="btn btn-sm btn-outline-secondary border-0"
+                      title="Marcar como pendente">
+                      <i class="bi bi-arrow-counterclockwise"></i>
+                    </button>
                     <button (click)="handleDeleteTask(task.id)" class="btn btn-sm btn-outline-danger border-0"
                       title="Excluir tarefa">
                       <i class="bi bi-trash"></i>

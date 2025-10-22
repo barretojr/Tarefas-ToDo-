@@ -26,11 +26,21 @@ namespace Tarefas.Servico
             return TarefaDTO.FromEntity(tarefa);
         }
 
-        public async Task<TarefaDTO> CriarAsync(TarefaDTO dto)
+        public async Task<TarefaDTO> CriarAsync(CriarTarefaDTO dto) 
         {
-            var tarefa = new Tarefa(dto.Titulo, dto.Descricao, dto.Prioridade);
-            await _repository.AdicionarAsync(tarefa);
-            return TarefaDTO.FromEntity(tarefa);
+            var prioridadeEnum = dto.Prioridade.ToLower() switch
+            {
+                "alta" => TarefaPrioridade.Alta, 
+                "media" => TarefaPrioridade.Media,
+                "baixa" => TarefaPrioridade.Baixa,
+                _ => TarefaPrioridade.Media
+            };
+
+            var novaTarefa = new Tarefa(dto.Titulo, dto.Descricao, prioridadeEnum);
+
+            await _repository.AdicionarAsync(novaTarefa);
+
+            return TarefaDTO.FromEntity(novaTarefa); 
         }
 
         public async Task<TarefaDTO> AtualizarAsync(Guid id, TarefaDTO dto)
@@ -44,14 +54,19 @@ namespace Tarefas.Servico
             return TarefaDTO.FromEntity(tarefa);
         }
 
-        public async Task ToggleAsync(Guid id)
+        public async Task<TarefaDTO> ToggleAsync(Guid id)
         {
             var tarefa = await _repository.ObterPorIdAsync(id);
             if (tarefa == null)
+            {
                 throw new Exception("Tarefa não encontrada");
+            }
 
-            tarefa.MarcarComoCompleta();
+            tarefa.AlternarStatus();
+
             await _repository.AtualizarAsync(tarefa);
+
+            return TarefaDTO.FromEntity(tarefa);
         }
 
         public async Task ExcluirAsync(Guid id)

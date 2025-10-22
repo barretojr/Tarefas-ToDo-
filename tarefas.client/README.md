@@ -1,59 +1,26 @@
-# TarefasClient
+# Tarefas.Client (Frontend)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.1.5.
+Este é o frontend da aplicação de Lista de Tarefas, desenvolvido com Angular 19.
 
-## Development server
+## Pré-requisitos
 
-To start a local development server, run:
+Antes de começar, garanta que você tenha o [Node.js](https://nodejs.org/) e o [Angular CLI](https://angular.dev/tools/cli) instalados em sua máquina.
 
-```bash
-ng serve
-```
+## Como Executar
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+1.  **Instale as dependências:**
+    Navegue até a pasta do projeto e execute o comando:
+    ```bash
+    npm install
+    ```
 
-## Code scaffolding
+2.  **Inicie o servidor de desenvolvimento:**
+    Execute o seguinte comando para iniciar a aplicação:
+    ```bash
+    ng serve
+    ```
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+3.  **Acesse a aplicação:**
+    Abra seu navegador e acesse `http://localhost:4200/`.
 
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+> **Nota:** Para que as funcionalidades de API funcionem, o projeto backend (`Tarefas.Server`) precisa estar em execução. A conexão é configurada no arquivo `proxy.conf.js`.

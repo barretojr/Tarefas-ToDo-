@@ -32,9 +32,14 @@ namespace Tarefas.Server.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Criar([FromBody] TarefaDTO dto)
+        public async Task<IActionResult> Criar([FromBody] CriarTarefaDTO criarDto)
         {
-            var tarefa = await _service.CriarAsync(dto);
+            if (criarDto == null)
+            {
+                return BadRequest();
+            }
+
+            var tarefa = await _service.CriarAsync(criarDto);
             return CreatedAtAction(nameof(Obter), new { id = tarefa.Id }, tarefa);
         }
 
@@ -45,12 +50,19 @@ namespace Tarefas.Server.Controllers
             return tarefa == null ? NotFound() : Ok(tarefa);
         }
 
-        //[HttpPatch("{id}/toggle")]
-        //public async Task<IActionResult> AlternarConclusao(Guid id)
-        //{
-        //    var tarefa = await _service.AlternarConclusaoAsync(id);
-        //    return tarefa == null ? NotFound() : Ok(tarefa);
-        //}
+        [HttpPatch("{id}/toggle")]
+        public async Task<IActionResult> AlternarConclusao(Guid id)
+        {
+            try
+            {                
+                var tarefaAtualizada = await _service.ToggleAsync(id); 
+                return Ok(tarefaAtualizada); 
+            }
+            catch (Exception ex)
+            {  
+                return NotFound(new { message = ex.Message });
+            }
+        }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Remover(Guid id)
