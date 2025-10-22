@@ -4,6 +4,7 @@ import { Notification, NotificationType } from '../models/tarefa.model';
 @Injectable({
   providedIn: 'root'
 })
+//Implementar as notificações no app.component.ts
 export class NotificationService {
   private nextId = 1;
   public notifications = signal<Notification[]>([]);
