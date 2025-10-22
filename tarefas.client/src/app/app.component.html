@@ -1,24 +1,139 @@
-﻿<h1 id="tableLabel">Weather forecast</h1>
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
+  <div class="max-w-6xl mx-auto space-y-6">
 
-<p>This component demonstrates fetching data from the server.</p>
+    <div class="text-center space-y-4">
+      <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+        Lista de Tarefas Angular
+      </h1>
+    </div>
 
-<p *ngIf="!forecasts"><em>Loading... Please refresh once the ASP.NET backend has started. See <a href="https://aka.ms/jspsintegrationangular">https://aka.ms/jspsintegrationangular</a> for more details.</em></p>
+    <div class="bg-white/70 backdrop-blur-sm p-4 rounded-lg shadow-md">
+      <h2 class="text-xl font-semibold mb-3">
+        Status do Sistema
+      </h2>
+      <div class="flex items-center justify-between gap-4 text-sm">
+        <div class="flex items-center gap-4">
+          <div class="flex items-center gap-2 px-3 py-1 rounded-full"
+               [ngClass]="useLocalStorage() ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'">
+            <div class="w-2 h-2 rounded-full"
+                 [ngClass]="useLocalStorage() ? 'bg-yellow-500' : 'bg-green-500'"></div>
+            {{ useLocalStorage() ? 'Armazenamento Local' : 'Backend C# + SQL' }}
+          </div>
+          <span class="text-gray-500">
+            Total de tarefas: {{ tasks().length }}
+          </span>
+        </div>
 
-<table *ngIf="forecasts">
-    <thead>
-        <tr>
-            <th>Date</th>
-            <th>Temp. (C)</th>
-            <th>Temp. (F)</th>
-            <th>Summary</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr *ngFor="let forecast of forecasts">
-            <td>{{ forecast.date }}</td>
-            <td>{{ forecast.temperatureC }}</td>
-            <td>{{ forecast.temperatureF }}</td>
-            <td>{{ forecast.summary }}</td>
-        </tr>
-    </tbody>
-</table>
+        <div class="flex gap-2">
+          <button class="px-4 py-2 border rounded-md text-sm transition-colors duration-150"
+                  [disabled]="isLoading()" (click)="loadTasks()">
+            <span [ngClass]="{'animate-spin': isLoading()}">🔄</span>
+            Recarregar
+          </button>
+          <button class="px-4 py-2 border rounded-md text-sm transition-colors duration-150"
+                  (click)="toggleStorageMode()">
+            {{ useLocalStorage() ? 'Usar Backend' : 'Usar Local' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+      <div class="xl:col-span-1">
+        <div class="p-6 bg-white rounded-lg shadow-xl space-y-4" [formGroup]="tarefaForm">
+          <h2 class="text-2xl font-bold mb-4">Criar Nova Tarefa</h2>
+
+          <div>
+            <label for="titulo" class="block text-sm font-medium text-gray-700">Título</label>
+            <input id="titulo" type="text" formControlName="titulo"
+                   class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+            <div *ngIf="tarefaForm.get('titulo')?.invalid && tarefaForm.get('titulo')?.touched" class="text-red-500 text-xs mt-1">
+              Título é obrigatório.
+            </div>
+          </div>
+
+          <div>
+            <label for="descricao" class="block text-sm font-medium text-gray-700">Descrição</label>
+            <textarea id="descricao" formControlName="descricao"
+                      class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"></textarea>
+          </div>
+
+          <div>
+            <label for="prioridade" class="block text-sm font-medium text-gray-700">Prioridade</label>
+            <select id="prioridade" formControlName="prioridade"
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+              <option value="Media">Média</option>
+              <option value="Baixa">Baixa</option>
+              <option value="Alta">Alta</option>
+            </select>
+          </div>
+
+          <button (click)="handleCreateTask()" [disabled]="tarefaForm.invalid || isCreating()"
+                  class="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-colors duration-150 disabled:opacity-50">
+            {{ isCreating() ? 'Criando...' : 'Adicionar Tarefa' }}
+          </button>
+        </div>
+
+        <div class="mt-4 p-4 bg-gray-50 rounded-lg shadow-sm text-xs">
+          <h3 class="font-semibold text-sm mb-2">Tecnologias (Requisito)</h3>
+          <div><strong>Frontend:</strong> Angular 19 + TypeScript + Reactive Forms</div>
+          <div><strong>Backend:</strong> C# (ASP.NET Core)</div>
+          <div><strong>Banco:</strong> SQL Server</div>
+          <div><strong>Estado:</strong> Angular Signals</div>
+        </div>
+      </div>
+
+      <div class="xl:col-span-2 space-y-3">
+        <p *ngIf="isLoading()">Carregando tarefas...</p>
+        <p *ngIf="!isLoading() && tasks().length === 0" class="text-center text-gray-500 p-8 bg-white rounded-lg shadow-md">
+          Nenhuma tarefa encontrada. Comece adicionando uma!
+        </p>
+
+        <div *ngFor="let task of tasks()">
+          <div class="p-4 bg-white rounded-lg shadow flex items-center justify-between transition-shadow hover:shadow-lg"
+               [ngClass]="{'bg-green-50 opacity-70': task.completa}">
+            <div>
+              <h3 class="font-bold" [ngClass]="{'line-through text-gray-500': task.completa}">{{ task.titulo }}</h3>
+              <p class="text-sm text-gray-600">{{ task.descricao }}</p>
+              <span class="text-xs font-semibold px-2 py-0.5 rounded-full"
+                    [ngClass]="{'bg-red-200 text-red-800': task.prioridade === 'Alta', 'bg-yellow-200 text-yellow-800': task.prioridade === 'Media', 'bg-blue-200 text-blue-800': task.prioridade === 'Baixa'}">
+                {{ task.prioridade | titlecase }}
+              </span>
+            </div>
+
+            <div class="flex space-x-2">
+              <button (click)="handleToggleComplete(task.id)"
+                      class="p-2 rounded-full transition-colors duration-150"
+                      [ngClass]="{'bg-green-500 hover:bg-green-600 text-white': !task.completa, 'bg-gray-300 hover:bg-gray-400 text-gray-700': task.completa}">
+                {{ task.completa ? '↩️ Pendente' : '✅ Concluir' }}
+              </button>
+              <button (click)="handleDeleteTask(task.id)"
+                      class="p-2 bg-red-500 hover:bg-red-600 text-white rounded-full transition-colors duration-150">
+                🗑️ Excluir
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-lg text-center mt-6">
+      <p class="text-sm">
+        🚀 Aplicação To Do List completa com Angular Signals, C# backend e SQL Server
+      </p>
+    </div>
+  </div>
+
+  <div class="fixed top-4 right-4 z-50 space-y-2">
+    <div *ngFor="let notif of notificationsSignal()"
+         class="p-3 pr-8 rounded-lg shadow-lg relative max-w-sm"
+         [ngClass]="{'bg-green-500 text-white': notif.type === 'success', 'bg-red-500 text-white': notif.type === 'error', 'bg-yellow-500 text-gray-900': notif.type === 'warning', 'bg-blue-500 text-white': notif.type === 'info'}">
+      {{ notif.message }}
+      <button (click)="dismissNotification(notif.id)"
+              class="absolute top-1 right-1 p-1 text-sm rounded-full opacity-70 hover:opacity-100">
+        &times;
+      </button>
+    </div>
+  </div>
+</div>

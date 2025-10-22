@@ -27,7 +27,7 @@ namespace Tarefas.Server.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Obter(Guid id)
         {
-            var tarefa = await _service.ObterPorIdAsync(id);
+            var tarefa = await _service.ObterAsync(id);
             return tarefa == null ? NotFound() : Ok(tarefa);
         }
 
@@ -45,18 +45,18 @@ namespace Tarefas.Server.Controllers
             return tarefa == null ? NotFound() : Ok(tarefa);
         }
 
-        [HttpPatch("{id}/toggle")]
-        public async Task<IActionResult> AlternarConclusao(Guid id)
-        {
-            var tarefa = await _service.AlternarConclusaoAsync(id);
-            return tarefa == null ? NotFound() : Ok(tarefa);
-        }
+        //[HttpPatch("{id}/toggle")]
+        //public async Task<IActionResult> AlternarConclusao(Guid id)
+        //{
+        //    var tarefa = await _service.AlternarConclusaoAsync(id);
+        //    return tarefa == null ? NotFound() : Ok(tarefa);
+        //}
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Remover(Guid id)
         {
-            var ok = await _service.RemoverAsync(id);
-            return ok ? NoContent() : NotFound();
+            await _service.ExcluirAsync(id);
+            return NoContent();
         }
     }
 }
